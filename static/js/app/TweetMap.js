@@ -415,25 +415,25 @@ define(['maplabel'], function () {
 
 
 
-        // function setTxtEntry(nghd, topic, sentiment, totalnum, posnum, negnum) {
-        //     thisContent = "<li class=\"dropdown-submenu\"><div class=\"divmargin\" onclick=\"getmymodal(\'" + nghd + "\',\'" + topic + "\')\"><h4 class=\"FirstUpper\">" + topic;
-        //     thisContent += "</h4>";
-        //     thisContent += "<table class=\"table table-condensed\" id=\"topicTable\"><tbody>";
-        //     thisContent += "<tr><td>Total tweets</td><td>" + totalnum;
-        //     thisContent += "</td></tr><tr><td>Positive tweets</td><td>" + posnum;
-        //     thisContent += "</td></tr><tr><td>Negative tweets</td><td>" + negnum;
-        //     thisContent += "</td></tr>";
-        //     thisContent += "</tbody></table></div></li><li class=\"divider\"></li>";
-        //     return thisContent;
-        // }
-
-
         function setTxtEntry(nghd, topic, sentiment, totalnum, posnum, negnum) {
             thisContent = "<li class=\"dropdown-submenu\"><div class=\"divmargin\" onclick=\"getmymodal(\'" + nghd + "\',\'" + topic + "\')\"><h4 class=\"FirstUpper\">" + topic;
-            thisContent += "</h4><div id=\"chart_div\" style=\"width:200px; height:50px\" ></div>";
-            thisContent += "</div></li><li class=\"divider\"></li>";
+            thisContent += "</h4>";
+            thisContent += "<table class=\"table table-condensed\" id=\"topicTable\"><tbody>";
+            thisContent += "<tr><td>Total tweets</td><td>" + totalnum;
+            thisContent += "</td></tr><tr><td>Positive tweets</td><td>" + posnum;
+            thisContent += "</td></tr><tr><td>Negative tweets</td><td>" + negnum;
+            thisContent += "</td></tr>";
+            thisContent += "</tbody></table></div></li><li class=\"divider\"></li>";
             return thisContent;
         }
+
+
+        // function setTxtEntry(nghd, topic, sentiment, totalnum, posnum, negnum) {
+        //     thisContent = "<li class=\"dropdown-submenu\"><div class=\"divmargin\" onclick=\"getmymodal(\'" + nghd + "\',\'" + topic + "\')\"><h4 class=\"FirstUpper\">" + topic;
+        //     thisContent += "</h4><div id=\"chart_div\" style=\"width:200px; height:50px\" ></div>";
+        //     thisContent += "</div></li><li class=\"divider\"></li>";
+        //     return thisContent;
+        // }
 
         function setTxtFoot() {
             return "</ul>";
