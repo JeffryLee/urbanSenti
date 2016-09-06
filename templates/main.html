@@ -1,0 +1,420 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+
+{% endblock head %}
+
+{% block body %}
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="/static/js/libs/d3/d3.layout.cloud.js"></script>
+<h2>People's attitude toward urban related topics in Pittsburgh</h2>
+<div class="container-fluid">
+    <div class="row">
+        <div id="controller-panel">
+            <div class="btn-toolbar" role="toolbar" aria-label="...">
+                <button id="get-nghd-names-btn" type="button" class="btn btn-default">Neighborhood Mode</button>
+                <button id="get-words-per-nghd-btn" type="button" class="btn btn-default">Topic mode</button>
+                <!-- <button id="get-emojis-per-nghd-btn" type="button" class="btn btn-default">Top 3 Emojis per Neighborhood</button> -->
+                <button id="clear-map-btn" type="button" class="btn btn-default pull-right">Clear Map</button>
+                <button id="show-nghd-bounds-btn" type="button" class="btn btn-default pull-right">Show Neighborhood Boundaries</button>
+            </div>
+        </div>
+    </div>
+</div>
+<label id="instructions">Click on a neighborhood name to see hot topics in it.</label>
+<div id="legendDiv" style="float:right;display: none;">
+    Positive: <span class="glyphicon glyphicon-one-fine-dot" id="liblue"></span>
+    Negative: <span class="glyphicon glyphicon-one-fine-dot" id="lired"></span>
+</div>
+<div id="map-canvas"></div>
+<div class="container-fluid" id="main">
+    <div class="row">
+        <div class="col-xs-8" id="left">
+
+            <div class="container" id="topicContainer" style="display: none">
+                <div class="tab-content">
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display: block; position: static; margin-bottom: 5px; width: 100%;">
+                        <div class="divmargin" >
+                            <h3>
+                                <div>Topics</div>
+                            </h3>
+                            <table class="table table-condensed">
+                                <tbody id="topictable">
+                                <tr class='topicEntry'>
+                                    <td>transportation</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>sound</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>neighborhood</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>apartment</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>shopping</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>eating</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>drinking</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>safety</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>sports</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>health</td>
+                                </tr>
+                                <tr class="topicEntry">
+                                    <td>garbage</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </ul>
+                    </div>
+            </div>
+            <div class="container" id="Dynamic-tab" style="display: none">
+                <!--<h2>Dynamic Tabs</h2>-->
+
+                <div id="info-top-bar">
+                    <h3 id="info-title">
+                        <div id="livehood-num">Shadyside</div>
+                    </h3>
+                </div>
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#home">Topics</a></li>
+                    <li><a data-toggle="tab" href="#menu1">Stats</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+                        <div class="tab-content">
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display: block; position: static; margin-bottom: 5px; width: 100%;">
+                                <li class="dropdown-submenu">
+                                    <div class="divmargin" onclick="getmymodal('Shadyside','eating')">
+                                        <h4>Transportation</h4>
+                                            <table class="table table-condensed">
+                                                <tbody>
+                                                <tr>
+                                                    <td nowrap="nowrap">Average sentiment</td>
+                                                    <td>0.3</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Total tweets</td>
+                                                    <td>30</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Positive tweets</td>
+                                                    <td>21</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Negative tweets</td>
+                                                    <td>9</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                    </div>
+                                            <!--<button type="button" class="btn btn-info btn-lg" id="myBtn">Open Modal</button>-->
+
+
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Modal -->
+
+                    </div>
+                    <div id="menu1" class="tab-pane fade">
+                        <p>Under construction.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="loading-modal"></div>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Detailed tweets</h4>
+            </div>
+            <div class="modal-body" id="myModalBody">
+                <div class="tabTable">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a data-toggle="tab" href="#positivetweet" onclick=clearDiv2()>Positive</a>
+                    </li>
+                    <li>
+                        <a data-toggle="tab" href="#negativetweet">Negative</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="positivetweet" class="tab-pane fade in active">
+                        <div id="positivetweet1">
+                        </div>
+                        <div id="positivetweet2" style="display: none">
+                        </div>
+                        <div id="positivetweet3" style="display: none">
+                        </div>
+                    </div>
+
+                    <div id="negativetweet" class="tab-pane">
+                        <div id="negativetweet1">
+                            <table class="table table-condensed">
+                                <tbody>
+                                <tr>
+                                    <td>We fuckin on the walls just to piss the neighbor's off.</td>
+                                    <td>-0.2130</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="negativetweet2" style="display: none">
+                        </div>
+                        <div id="negativetweet3" style="display: none">
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ok, so this loads require.js, and the data-main attribute tells require.js
+to start looking in static/js/app.js, I think. the baseUrl is set as static/js. -->
+<script src="//maps.googleapis.com/maps/api/js?key=AIzaSyA4Q2paq2YyyAIipeVSOohRtXD_FOzD1JY&language=en&libraries=drawing,places,visualization"></script>
+<script src="static/js/libs/google-maps-utility-library-v3/maplabel/src/maplabel.js"></script>
+<script src="static/js/libs/google-maps-utility-library-v3/infobubble/src/infobubble.js"></script>
+<script src="static/js/libs/google-maps-utility-library-v3/markerwithlabel/src/markerwithlabel.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi?.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.load('visualization', '1.0', {'packages':['corechart']});
+
+    var dataSet = [
+        ['Channel', ' Positive', { role: 'annotation'}, 'Negative', { role: 'annotation' }],
+        ['', 91, 91, 50, 50],
+    ];
+
+
+    google.setOnLoadCallback(drawChart);
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable( dataSet );
+
+
+// Set chart options
+        var options = {
+            isStacked: 'percent',
+            fontSize: 16,
+            backgroundColor: 'transparent',
+            enableInteractivity: false,
+        };
+
+// Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
+    function resizeHandler () {
+        chart.draw(data, options);
+    }
+    if (window.addEventListener) {
+        window.addEventListener('resize', resizeHandler, false);
+    }
+    else if (window.attachEvent) {
+        window.attachEvent('onresize', resizeHandler);
+    }
+</script>
+
+<!--<script src="static/js/libs/jquery/dist/jquery.min.js"></script>-->
+<!--<script src="static/js/app/bootstrap.min.js"></script>-->
+
+<script data-main="static/js/app.js" src="{{ url_for('static', filename='js/libs/requirejs/require.js') }}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="static/js/app/bootstrap.min.js"></script>
+<script src="static/js/app/map_safety.js"></script>
+
+<script>
+//    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+//        var target = $(e.target).attr("href"); // activated tab
+//        alert(target);
+//    });
+    
+    function clearDiv2() {
+        document.getElementById("positivetweet2").style.display = "none";
+        document.getElementById("negativetweet2").style.display = "none";
+    }
+</script>
+<script>
+    var fill;
+    var layout;
+    var nghdn;
+    var topicn;
+    function func(ispos, nghdf, topicf, termArr, tfIdfArr){
+//        data1 = [
+//            "Hello", "world", "normally", "you", "want", "more", "words",
+//            "than", "this", "Zhihu"];
+        nghdn = nghdf;
+        topicn = topicf;
+        tmpArr = [];
+        for (var i=0; i<termArr.length; i++) {
+            tmpArr.push({text: termArr[i], size: 40 + tfIdfArr[i] * 120, test: "haha" })
+        }
+
+        fill = d3.scale.category20();
+        if (ispos) {
+            layout = d3.layout.cloud()
+                    .size([550, 400])
+                    .words(tmpArr)
+                    .padding(5)
+                    .rotate(function () {
+                        return 0;
+                    })
+                    .font("Impact")
+                    .fontSize(function (d) {
+                        return d.size;
+                    })
+                    .on("end", drawpos);
+        }
+        else {
+            layout = d3.layout.cloud()
+                    .size([550, 400])
+                    .words(tmpArr)
+                    .padding(5)
+                    .rotate(function () {
+                        return 0;
+                    })
+                    .font("Impact")
+                    .fontSize(function (d) {
+                        return d.size;
+                    })
+                    .on("end", drawneg);
+        }
+
+        layout.start();
+    }
+
+
+    function drawpos(words) {
+        document.getElementById("positivetweet1").innerHTML = "";
+        d3.select("#positivetweet1").append("svg")
+                .attr("width", layout.size()[0])
+                .attr("height", layout.size()[1])
+                .append("g")
+                .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function(d) { return d.size + "px"; })
+                .style("font-family", "Impact")
+                .style("fill", function(d, i) { return fill(i); })
+                .attr("text-anchor", "middle")
+                .attr("transform", function(d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function(d) { return d.text; })
+                .on("click", function(d) {
+                    $.ajax({
+                        type: "get",
+                        data:{nghd: nghdn, topic: topicn, senti: "positive", keyword: d.text},
+                        url: SCRIPT_ROOT + "/get-related-tweets-by-word",
+                        success: function(response) {
+                            tweets_per_word = response["tweets_per_word"];
+                            var thecontent = [];
+                            var thesenti = [];
+                            var tmpvar = [];
+                            for (var j=0;j<tweets_per_word.length;j++){
+                                tmpvar = tweets_per_word[j].split("&a*a&");
+                                thecontent.push(tmpvar[0]);
+                                thesenti.push(tmpvar[1]);
+                            }
+
+                            document.getElementById("positivetweet2").innerHTML = "<h4>Tweets about "+d.text+"</h4>"+buildTableContent(thecontent,thesenti);
+                            document.getElementById("positivetweet2").style.display="block";
+                        },
+                        error: function () {
+                            console.log("ajax request failed for " + this.url);
+                        }
+                    });
+
+//                    document.getElementById("negativetweet2").innerHTML = "hahahha";
+                });
+    }
+
+    function drawneg(words) {
+        document.getElementById("negativetweet1").innerHTML = "";
+        d3.select("#negativetweet1").append("svg")
+                .attr("width", layout.size()[0])
+                .attr("height", layout.size()[1])
+                .append("g")
+                .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function(d) { return d.size + "px"; })
+                .style("font-family", "Impact")
+                .style("fill", function(d, i) { return fill(i); })
+                .attr("text-anchor", "middle")
+                .attr("transform", function(d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function(d) { return d.text; })
+                .on("click", function(d) {
+                    $.ajax({
+                        type: "get",
+                        data:{nghd: nghdn, topic: topicn, senti: "negative", keyword: d.text},
+                        url: SCRIPT_ROOT + "/get-related-tweets-by-word",
+                        success: function(response) {
+                            tweets_per_word = response["tweets_per_word"];
+                            var thecontent = [];
+                            var thesenti = [];
+                            var tmpvar = [];
+                            for (var j=0;j<tweets_per_word.length;j++){
+                                tmpvar = tweets_per_word[j].split("&a*a&");
+                                thecontent.push(tmpvar[0]);
+                                thesenti.push(tmpvar[1]);
+                            }
+
+                            document.getElementById("negativetweet2").innerHTML = "<h4>Tweets about "+d.text+"</h4>"+buildTableContent(thecontent,thesenti);
+                            document.getElementById("negativetweet2").style.display="block";
+                        },
+                        error: function () {
+                            console.log("ajax request failed for " + this.url);
+                        }
+                    });
+
+//                    document.getElementById("negativetweet2").innerHTML = "hahahha";
+                });
+    }
+
+
+
+</script>
+<!--<script>-->
+<!--//    func(true);-->
+    <!--$("#myModal").modal("show");</script>-->
+{% endblock body %}

@@ -1,0 +1,174 @@
+html, body {
+    height: 100%;
+    margin: 10px;
+    padding: 0;
+}
+
+#main, #main>.row {
+    /*width: 30%;*/
+    height:100%;
+}
+
+#main>.row {
+    /*width: 0%;*/
+    overflow-y:scroll;
+}
+#Dynamic-tab {
+    width: 100%;
+}
+#topicContainer{
+    width: 100%;
+}
+
+
+   
+#map-canvas {
+    height: 100%;
+    width: 75%;
+    /*margin: 10px;*/
+    /*padding: 0;*/
+    position:absolute;
+    right:1px;
+    top:135px;
+    bottom:0;
+    overflow:hidden;
+}
+#left {
+    width: 25%;
+    height:100%;
+}
+#scrollbox {
+    max-height: 200px;
+    max-width: 2000px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    padding-right: 35px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.limargin {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.divmargin {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#controller-panel {
+    height:100%;
+}
+
+.loading-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba( 255, 255, 255, .8 )
+                url('https://i.stack.imgur.com/FhHRx.gif')
+                50% 50%
+                no-repeat;
+}
+
+body.loading {
+    overflow: hidden;
+}
+
+body.loading .loading-modal {
+    display: block;
+}
+
+.btn.active {
+    color: #fff;
+    background-color: #36648B;
+}
+
+
+.dropdown-submenu {
+    position:relative;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    /*overflow-x:hidden;*/
+    /*overflow-y:auto;*/
+    /*max-height: 30px;*/
+}
+.dropdown-submenu>.dropdown-menu{
+    top:0;
+    left:100%;
+    margin-top:-6px;
+    margin-left:-1px;
+    -webkit-border-radius:0 6px 6px 6px;
+    -moz-border-radius:0 6px 6px 6px;
+    border-radius:0 6px 6px 6px;
+}
+.dropdown-submenu:hover{
+    background-color: #ccffff;
+    /*display:block;*/
+}
+.dropdown-submenu>a:after{
+    display:block;content:" ";
+    float:right;
+    width:0;
+    height:0;
+    border-color:transparent;
+    border-style:solid;
+    border-width:5px 0 5px 5px;
+    border-left-color:#cccccc;
+    margin-top:5px;
+    margin-right:-10px;
+}
+.dropdown-submenu:hover>a:after{
+    border-left-color:#ffffff;
+}
+.dropdown-submenu.pull-left {
+    float:none;
+}.dropdown-submenu.pull-left>.dropdown-menu{
+     left:-100%;
+     margin-left:10px;
+     -webkit-border-radius:6px 0 6px 6px;
+     -moz-border-radius:6px 0 6px 6px;
+     border-radius:6px 0 6px 6px;
+ }
+
+.table.table-condensed{
+    max-width: 1000px;
+}
+
+#topicTable td, #topicTable th {
+    border: none;
+}
+.topicEntry{
+    text-transform: capitalize;
+}
+.FirstUpper{
+    text-transform: capitalize;
+}
+
+ul {
+    margin-left: 2em;
+    padding-left: 1em;
+    list-style-type: disc;
+}
+
+#lired {
+    color: #ef8a62;
+}
+
+#liblue {
+    color: #67a9cf;
+}
+
+
+.glyphicon.glyphicon-one-fine-dot:before {
+    content: "\25cf";
+    font-size: 1.5em;
+}
+
+.topicEntry:hover {
+    background-color: #ccffff;
+}
